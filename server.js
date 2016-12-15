@@ -2,14 +2,7 @@ var express = require('express');
 var mongo = require('mongodb').MongoClient;
 var app = express();
 
-
-var dbUrl;
-
-if (process.env.NODE_ENV) {
-  dbUrl = "";
-} else {
-  dbUrl = "mongodb://localhost:27017/yasser";
-}
+var dbUrl = process.env.DATABASE_URL || "mongodb://localhost:27017/yasser";
 
 app.use(express.static('public'));
 
