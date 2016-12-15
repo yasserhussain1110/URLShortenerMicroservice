@@ -42,8 +42,11 @@ app.get('/new/*', function (req, res) {
 });
 
 function constructUrlFromId(req, url_id) {
-  var prot = req.connection.encrypted ? "https" : "http";
-  return prot + "://" + req.headers.host + "/" + url_id;
+
+  var proto = req.headers['x-forwarded-proto'] ||
+                req.connection.encrypted ? "https" : "http";
+
+  return proto + "://" + req.headers.host + "/" + url_id;
 }
 
 app.listen(process.env.PORT || 8080);
