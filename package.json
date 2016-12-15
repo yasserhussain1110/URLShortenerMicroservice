@@ -1,0 +1,22 @@
+{
+  "name": "url-shortener",
+  "version": "1.0.0",
+  "description": "A microservice for FCC challenge which shortens URL",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "FCC",
+    "microservice",
+    "express",
+    "js",
+    "mongodb"
+  ],
+  "author": "Yasser Hussain",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.14.0",
+    "mongodb": "^2.2.16"
+  }
+}
