@@ -2,8 +2,16 @@ var express = require('express');
 var mongo = require('mongodb').MongoClient;
 var app = express();
 
-app.use(express.static('public'));
 
+var dbUrl;
+
+if (process.env.NODE_ENV) {
+  dbUrl = "";
+} else {
+  dbUrl = "mongodb://localhost:27017/yasser";
+}
+
+app.use(express.static('public'));
 
 app.get('/:id(\\d+)', function (req, res) {
   var id = req.params.id;
@@ -45,14 +53,14 @@ function constructUrlFromId(req, url_id) {
   return prot + "://" + req.headers.host + "/" + url_id;
 }
 
-app.listen(8080);
+app.listen(process.env.PORT || 8080);
 
 //db.shortened_url.createIndex({url_id: 1}, {unique: true})
 //db.shortened_url.createIndex({original_url: 1}, {unique: true})
 
 
 function insertUrl(url, successCallback, failureCallback) {
-  mongo.connect("mongodb://localhost:27017/yasser", function (err, db) {
+  mongo.connect(dbUrl, function (err, db) {
     const shortenedURL = db.collection("shortened_url");
     shortenedURL.find({}, {url_id: 1}).sort({url_id: -1}).limit(1).toArray(function (err, docs) {
       if (docs.length == 0) {
@@ -75,7 +83,7 @@ function insertUrl(url, successCallback, failureCallback) {
 }
 
 function findUrl(url_id, successCallback, failureCallback) {
-  mongo.connect("mongodb://localhost:27017/yasser", function (err, db) {
+  mongo.connect(dbUrl, function (err, db) {
     const shortenedURL = db.collection("shortened_url");
     shortenedURL.find({
       url_id: {
