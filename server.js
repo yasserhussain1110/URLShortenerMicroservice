@@ -24,7 +24,6 @@ app.get('/new/*', function (req, res) {
   var url = req.params['0'];
   if (isValid(url)) {
     var onSuccess = function(url_id) {
-      constructUrlFromId(req, url_id);
       res.json({original_url: url, short_url: constructUrlFromId(req, url_id)});
     };
 
