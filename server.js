@@ -92,6 +92,7 @@ function findUrl(url_id, successCallback, failureCallback) {
         var original_url = docs[0].original_url;
         successCallback(original_url);
       }
+      db.close();
     });
   });
 }
