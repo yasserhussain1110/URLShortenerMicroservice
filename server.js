@@ -27,8 +27,14 @@ app.get('/new/*', function (req, res) {
       res.json({original_url: url, short_url: constructUrlFromId(req, url_id)});
     };
 
-    var onFailure = function(message) {
-      res.json({error: message});
+    var onFailure = function(error) {
+      if(error.code === 11000) {
+        findUrlId(url, onSuccess, function(error) {
+          res.json({error: error.message});
+        });
+      } else {
+        res.json({error: error.message});
+      }
     };
 
     insertUrl(url, onSuccess, onFailure);
@@ -66,13 +72,32 @@ function insertUrl(url, successCallback, failureCallback) {
 
       shortenedURL.insert({original_url: url, url_id: id}, function (err, data) {
         if (err) {
-          failureCallback(err.message);
+          failureCallback(err);
         } else {
           var url_id = data.ops[0].url_id;
           successCallback(url_id);
         }
         db.close();
       });
+    });
+  });
+}
+
+function findUrlId(url, successCallback, failureCallback) {
+  mongo.connect(dbUrl, function (err, db) {
+    const shortenedURL = db.collection("shortened_url");
+    shortenedURL.find({
+      original_url: {
+        $eq: url
+      }
+    }).toArray(function (err, docs) {
+      if (err || docs.length == 0) {
+        failureCallback(err.message);
+      } else {
+        var url_id = docs[0].url_id;
+        successCallback(url_id);
+      }
+      db.close();
     });
   });
 }
@@ -99,6 +124,6 @@ function findUrl(url_id, successCallback, failureCallback) {
 
 function isValid(url) {
   // http://www.example.com
-  var regex = /^https?:\/\/www\.\w+\.[a-zA-Z]+(\.[a-zA-Z]+)?\/?$/;
+  var regex = /^https?:\/\/([a-z]+\.)?\w+\.[a-zA-Z]+(\.[a-zA-Z]+)?\/?$/;
   return regex.test(url);
 }
